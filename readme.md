@@ -5,7 +5,7 @@
 * Learn how to handle events in React.
 * Show how to use functional components in React.
 * Show how to use JSX attributes to style components conditionally.
-* Look at the React documentation a bit more closely.
+* Look at the React documentation to learn more.
 
 ## Framing
 So far, we have worked with data flow and the component architecture in React. Today, we are going to look into interactivity in React and how we make our components dynamic! Throughout this class, we are going to be using an API that contains vocabulary words from the Oxford Dictionary API. 
