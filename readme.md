@@ -252,6 +252,3 @@ Add a button that, when clicked, toggles whether or not the definition card is d
 * Describe how to best gather information from a form in React. Be prepared to show code!
 
 * Compare and contrast stateful, stateless, and functional components in React. List the pros and cons of each. When would we use one over the other?
-
-
-## Conclusion
