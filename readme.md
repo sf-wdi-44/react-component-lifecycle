@@ -67,7 +67,7 @@ This exercise is a simple, 2 "page" website where each page is a component. We'l
 * What causes the method to be (re)invoked?
 
 ## An Aside: Axios
-> 15 min / 0:55
+> 10 min / 0:50
 
 For our first example of working with the component lifecycle methods, we'll me retrieving data from an API using AJAX. AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
 
@@ -121,10 +121,13 @@ You can also append values to the parameters by passing in a second input to `.g
 
 Which would result in a GET request to: `url?key1=value1&key2=value2`.
 
+### We Do: Axios and AJAX inside a React Component:
+> 15 min / 1:05
+
 We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios).
 
 ## Break
-> 10 min / 1:05
+> 10 min / 1:15
 
 ## Flashcards
 > 85 min / 2:30
