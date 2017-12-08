@@ -1,32 +1,32 @@
 # Event Handlers and the Component Lifecycle in React
 
 ## Learning Objectives
-* Learn how to utilize and understand React's lifecycle methods.
-* Learn how to handle events in React.
-* Show how to use functional components in React.
-* Show how to use JSX attributes to style components conditionally.
-* Look at the React documentation to learn more.
+* Understand how to use React's lifecycle methods
+* Retrieve data from an API inside of a component
+* Handle events in React
+* Look at the React documentation to learn more
 
 ## Framing
-So far, we have worked with data flow and the component architecture in React. Today, we are going to look into interactivity in React and how we make our components dynamic! Throughout this class, we are going to be using an API that contains vocabulary words from the Oxford Dictionary API. 
+> 10 min / 0:10
 
-The goal of our app will be to cycle through flashcards and build a timer so that you can only spend 10 seconds thinking of a definition for the word.
+Up to this point, we've used react to build out components that make up simple applications. We added state and props to these components and controlled data flow through them. With this alone, we do have the capacity to build out an application but they'll be limited.
 
-Let's go ahead and clone the repository:
-```bash
-$ git clone git@git.generalassemb.ly:ga-wdi-exercises/flashcards.git
-$ npm install
-$ npm run start
-```
+How do we get data from an API? Well we could drop in an AJAX call to fetch some data, but our component would likely render before the AJAX request returned with our data. Our component would see that our data is `undefined` and either render a blank/empty component or throw an error.
 
-Some of the code is already written for us: lets do a quick walk-through.
+How would we animate a component? (i.e. a sidebar that usually lives off the page, except for when a hamburger menu is pressed.) We could write some code to animate the position of the sidebar, but how could we guarantee it was running after our Sidebar component's render method had been called?
 
+This lesson will walk us through the Component Lifecycle: hooks that are fired at different stages of a components "life" for solving the problems described above, as well as many others.
+
+Throughout the course of this lesson, we'll build out a simple flashcard app with vocabulary keywords pulled form the Oxford Dictionary API. Our flashcard app will cycle through a set of flashcards, giving us 10 seconds to think of the definition before moving on to the next card.
+
+But first, what is the Component Lifecycle?
 
 ## The Component Lifecycle
+> 10 min / 0:20
 
-React class components provide several lifecycle methods that you can use to control your application based on the state of the UI.
+Class-based components provide several lifecycle methods that you can use to control your application based on the state of the UI.
 
-These methods happen automatically - but you can call them to modify them.
+If defined, these methods will be invoked automatically so you can define the ones you need.
 
 These methods are called at specific points in the rendering process. You can use these methods to perform actions based on what's happening on the DOM.
 
@@ -35,177 +35,170 @@ These methods are called at specific points in the rendering process. You can us
 
 Some common uses of lifecycle methods are making asynchronous requests, binding event listeners, and optimizing for performance.
 
-## At a very high level
+### At a very high level
 
-React components' lifecycle events fall into three broad categories:
+There are two types of component lifecycle methods, categorized by when the occur in the lifecycle: **mounting** lifecycle methods and **updating** lifecycle methods
 
-
-* **Initializing / Mounting** e.g. What happens when the component is created? Was an initial state set? Methods:
+* **Mounting** lifecycle methods. e.g. What happens when the component is created? Was an initial state set? Methods:
   - `constructor()`
-    - This is sometimes referred to as a combination of `getInitialState()` and `getDefaultProps()`
   - `componentWillMount()`
-  - `componentDidMount()`
   - `render()`
+  - `componentDidMount()`
+  - `componentWillUnmount()`
 
-
-* **Updating** e.g. Did an event happen that changed the state? Methods:
+* **Updating** lifecycle methods. e.g. Has state changed? Methods:
   - `componentWillReceiveProps()`
   - `shouldComponentUpdate()`
   - `componentWillUpdate()`
-  - `componentDidUpdate()`
   - `render()`
-
-
-* **Destruction / Unmounting** e.g. What needs to happen when we're done with the component? Method:
-  - `componentWillUnmount()`
-
-Let's go through them. Again, you don't need to write these methods - they happen automatically, just like constructors did before we explicitly wrote one. You only have to worry about these if you want to change something in them - but if you do, it's important to understand them!
+  - `componentDidUpdate()`
 
 [Check out the documentation on components!](https://facebook.github.io/react/docs/react-component.html)
 
-<img width='500px' src="https://kunigami.files.wordpress.com/2016/01/react.png">
+### We do: Exploring the Lifecycle methods
+> 20 min / 0:40
 
-Open this image in a new window next to this one, and follow along as we go through the methods.
+Let's clone down [this repository](https://git.generalassemb.ly/ga-wdi-exercises/react-component-lifecycle) with a short exercise for exploring the lifecycle methods.
 
-## `constructor()`
+This exercise is a simple, 2 "page" website where each page is a component. We'll be adding the component lifecycle methods to each page-component. As we do consider the following questions:
 
-This is something we've already seen when we were learning `state`. Like any JavaScript class, the `constructor` method is called when a component is instantiated (when it's first rendered).  
-In a class constructor, you must call `super` before you do anything else. So a React component constructor in its most basic form looks like this:
+* When is the method get invoked in relation to when the content is rendered?
+* How many times is the method invoked?
+* What causes the method to be (re)invoked?
 
-```javascript
-constructor(props) {
-  super(props)
-}
-```
+## An Aside: Axios
+> 15 min / 0:55
 
-You don't need to define a constructor if that's all it does, though. This happens automatically when your component is invoked. A common use of the constructor is to initialize state using the props passed to the component - as we have been doing!
+For our first example of working with the component lifecycle methods, we'll me retrieving data from an API using AJAX. AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
 
-```javascript
-constructor(props) {
-  super(props)
+We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method. Some benefits to using Axios:
 
-  this.state = {
-     flashcards: [],
-     currentIndex: 0,
-     show: false
-  }
-}
-```
+  - It is a promise-based library with an interface for simpler and cleaner syntax
+  - It is lightweight and focused solely on handling HTTP requests (as opposed to jQuery which brings in an extensive set of new functions and methods)
+  - It is flexible and has a number of very useful methods for doing more complex requests from one or multiple API endpoints
 
-> This constructor sets the initial `flashcards` state of the component to an empty array. Then, using `setState`, you can add flashcards, delete them, or whatever else your component allows. We also set the `currentIndex` to 0. This will be the index of the card we are currently on. `show` will represent whether the definition of the card is visible or not.
+Read more at the [Axios Documentation](https://github.com/mzabriskie/axios)
 
-#### Binding
-In React, when we use event methods, we usually have to bind the `this` keyword to the method so that it works properly. Class methods are not bound by default, so `this` is undefined unless we specify otherwise. We could bind `this` to the event each time we call it; however, it is usually more efficient to do so by default in the constructor... 
+> Note: Axios is just one of many Javascript libraries that we could use for handling requests. One of the big selling points of Node is the ability to mix and match technologies according to preference. Other commonly-used tools for handling requests are Fetch and jQuery.
+
+To load in the Axios module:
 
 ```js
-constructor (props) {
-  super(props)
-  this.handleClick = this.handleClick.bind(this)
-}
+// If you are using Babel to compile your code
+import axios from 'axios'
+
+// In standard vanilla Javascript
+let axios = require('axios')
 ```
 
-Then when we add the event handler, we can just do so just like this:
+To use Axios to query an API at a given url endpoint:
+```js
+  axios.get('url')
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+```
+
+You can also append values to the parameters by passing in a second input to `.get()`:
 
 ```js
-<button onClick={this.handleClick}/>
+  axios.get('url', {
+    params: {
+      key1: value1,
+      key2: value2
+    }
+  })
+  .then((response) => {
+    console.log(response)
+  })
+  .catch((error) => {
+    console.log(error)
+  })
 ```
-This is not a React specific behavior, it applies to JavaScript classes in general.
 
+Which would result in a GET request to: `url?key1=value1&key2=value2`.
 
-## `componentWillMount()`
+We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios).
 
-This method is called immediately before a component is rendered to the DOM. You generally won't need to use this method. Advanced use-cases like server-rendering are usually the only ones in which `componentWillMount` is needed.
+## Break
+> 10 min / 1:05
 
-## `componentDidMount()` and `componentWillUnmount()`
+## Flashcards
+> 85 min / 2:30
 
-The `componentDidMount` method is called once, immediately after your component is rendered to the DOM. If you want to make an AJAX request when your component first renders, this is where to do it (_not_ in the constructor, or in `componentWillMount`). `componentWillMount` shouldn't be used for server requests because it may be invoked multiple times before render in future versions of React. [Side effects](https://en.wikipedia.org/wiki/Side_effect_(computer_science)) should be avoided in the `constructor`, and so server requests shouldn't be made there. The accepted answer on [this Stack Overflow](http://stackoverflow.com/questions/41612200/in-react-js-should-i-make-my-initial-network-request-in-componentwillmount-or-co) from a member of the React team at Facebook gives more detail. 
+As we dive deeper in to each of the component lifecycle methods and what they're used for, we'll work through the following exercise to create a simple flashcards app.
 
-Another common use for `componentDidMount` is to bind event listeners to your component. You can then remove the event listeners in `componentWillUnmount`. For example, you could bind and unbind an event listener for a drag-drop component.
+The starter code for this exercise can be found [here](https://git.generalassemb.ly/ga-wdi-exercises/flashcards).
+
+Let's go ahead and clone the repository:
+
+```bash
+$ git clone git@git.generalassemb.ly:ga-wdi-exercises/flashcards.git
+$ npm install
+$ npm start
+```
+
+The app we're going to build will pull word definitions from the Oxford Dictionary API and create a flashcard for each word. The app will then cycle through each word, giving the user 10 seconds to think of the definition before moving on to the next card.
 
 ### We Do: Adding the Flashcard Container
-```javascript
+
+<details>
+    <summary>Solution</summary>
+
+```js
 class FlashcardContainer extends React.Component {
     constructor(props) {
-      super(props)
-      this.state = {
-        flashcards: [],
-        currentIndex: 0
-      }
+        super(props)
+        this.state = {
+            flashcards: [],
+            currentIndex: 0
+        }
     }
 
     next () {
-      if (this.state.show) 
-        this.setState(currState => ({currentIndex: currState.currentIndex + 1}))
+        if (this.state.show)
+	        this.setState(currState => ({currentIndex: currState.currentIndex + 1}))
     }
 
     componentDidMount () {
-      window.addEventListener('keyup', (event) => {
-        // move to next card on right arrow
-        if (event.keyCode === 39) 
-          this.next()
-      })
+        window.addEventListener('keyup', (event) => {
+            // move to next card on right arrow
+            if (event.keyCode === 39)
+            this.next()
+        })
 
-      axios
-        .get(`${CLIENT_URL}/api/words`)
-        .then(response => this.setState({flashcards: response.data}))
-        .catch(err => console.log(err))
+        axios
+	        .get(`${CLIENT_URL}/api/words`)
+	        .then(response => this.setState({flashcards: response.data}))
+	        .catch(err => console.log(err))
     }
-    
+
     render() {
-      let flashcard = this.state.flashcards[this.state.currentIndex]
-      return (
-        <div>
-            <main>
-              <div className="container">
-              </div>
-            </main>
-        </div>
-      )
+        let flashcard = this.state.flashcards[this.state.currentIndex]
+        return (
+            <div>
+	            <main>
+		            <div className="container">
+		            </div>
+	            </main>
+            </div>
+        )
     }
 }
-
 ```
+
+</details>
 
 In this example, we have added a constructor that has a few initial state properties. We also add an event listener that switches to the next card on right arrow press. Finally, we add an API pull to fetch the dynamic data we will use for the app.
 
-## `render()`
-
-This is the one method that every React class component **must** have. In render, you return JSX using the component's props and state. You should never set state in render - render should only react to changes in state or props, not create those changes. 
-
-## `componentWillReceiveProps(newProps)`
-
-This method is called any time your component receives new props. It is _not_ called with the initial props when your component initially mounts. If you need to change the state of your component based on changes in the props, this is where you do it. In a simple app, you generally won't need `componentWillReceiveProps`.
-
-## `shouldComponentUpdate`, `componentWillUpdate`, `componentDidUpdate`
-
-These methods are called when a component's props or state change, and are generally used for performance optimizations. React is quite fast by itself, and you usually don't need to concern yourself with these methods outside of a large app with many dynamic components.
-
-
 ### You Do: Adding a Timer to the Flashcard
+
 Add a timer to the Flashcard Detail component. Initialize the timer to have 10 seconds on it. Every second the same flashcard is still on the board, remove a second from it (hint: use `window.setTimeout()`). When the `FlashcardDetail` component receives a new card, restart the timer (hint: use `componentWillReceiveProps`).
 
-
-## Styling Components
-
-When it comes to adding styles to React, there is a bit of debate over what's the best practice. Facebook's official docs and recommendations are to write stylesheets that treat your CSS rule declarations as properties on one big Javascript object that can be passed into components via inline styles.
-
-From the [Docs](https://facebook.github.io/react/tips/inline-styles.html)...
-
->  "In React, inline styles are not specified as a string. Instead they are specified with an object whose key is the camelCased version of the style name, and whose value is the style's value, usually a string"
-
-However, this kind of rethinking the wheel feels like a step backwards for a lot of designers and developers who cringe at the notion of inline styles. For them, they choose to build React apps through a more traditional flow of adding ids and classes and then targeting elements via external stylesheets.
-
-Also, via Webpack and other custom loaders, it is possible to use many third-party libraries or processors such as SASS, LESS, and Post-CSS.
-
-Interesting to note, this problem has not been universally solved, and thus the debate will most likely continue to rage on until [somebody](https://medium.com/@jviereck/modularise-css-the-react-way-1e817b317b04#.61qgjgdu3) figures it out. Therefore, its often left to a team decision when choosing the best option for the application.
-
-> Interested in learning more? Check out some excellent [blog posts](http://jamesknelson.com/why-you-shouldnt-style-with-javascript/) on the [subject](http://stackoverflow.com/questions/26882177/react-js-inline-style-best-practices) from the [front-end community](https://css-tricks.com/the-debate-around-do-we-even-need-css-anymore/)
-
-### [Example of Object Literal Styles with React](https://github.com/ga-wdi-exercises/react-omdb/commit/830697fc68dcdccafcae9f73e711103de8d93fc9)
-
-> **Reminder**: `class` is a protected keyword in React, in order to add a class attribute to an element use the keyword `className`
-
-## We Do: Adding the Definition Component
+#### We Do: Adding the Definition Component
 
 Now that we have our flashcard word displayed, lets add the definition as well.
 
@@ -225,8 +218,7 @@ let Definition = props => {
     }
 
     return (
-        <div 
-            className="card text-center"
+        <div className="card text-center"
             style={styles}>
             <h5>Definition {idx + 1}</h5>
             <p>{ def.definitions[0] }</p>
@@ -235,20 +227,39 @@ let Definition = props => {
 }
 ```
 
-## Event Handlers
-Throughout the last few classes, you've seen a couple event handlers. These look similar to including them inline in HTML. 
-
-In the React Intro class, we went over how we are not actually interacting directly with the DOM when we write React code, rather, we are interacting with the virtualDOM. Because of this, when we call an event listener, we use `SyntheticEvent`'s instead of the usual event objects we are used to dealing with in JQuery events. We still get all of the same properties attached to them, and some additional ones. Because of this, the traditional documentation on event handlers is sometimes not accurate. Instead, use the React event handling documentation found [here](https://facebook.github.io/react/docs/events.html). Spend a few minutes looking at the different events on listed here.
-
 ## You Do: Show or Hide the Definition
-Add a button that, when clicked, toggles whether or not the definition card is displayed on the page. 
+
+Add a button that, when clicked, toggles whether or not the definition card is displayed on the page.
 
 ## React Documentation
 
 * What is an uncontrolled component in React? Why would we use it instead of a controlled one?
-
 * Describe 1-way and 2-way data binding. Which model does React use? Explain and compare to other popular front-end frameworks.
-
 * Describe how to best gather information from a form in React. Be prepared to show code!
-
 * Compare and contrast stateful, stateless, and functional components in React. List the pros and cons of each. When would we use one over the other?
+
+## Bonus
+
+### Binding
+
+In React, when we use event methods, we usually have to bind the `this` keyword to the method so that it works properly. Class methods are not bound by default, so `this` is undefined unless we specify otherwise. We could bind `this` to the event each time we call it; however, it is usually more efficient to do so by default in the constructor...
+
+```js
+constructor (props) {
+  super(props)
+  this.handleClick = this.handleClick.bind(this)
+}
+```
+
+Then when we add the event handler, we can just do so just like this:
+
+```js
+<button onClick={this.handleClick}/>
+```
+This is not a React specific behavior, it applies to JavaScript classes in general.
+
+## Event Handlers
+
+Throughout the last few classes, you've seen a couple event handlers. These look similar to including them inline in HTML.
+
+In the React Intro class, we went over how we are not actually interacting directly with the DOM when we write React code, rather, we are interacting with the virtualDOM. Because of this, when we call an event listener, we use `SyntheticEvent`'s instead of the usual event objects we are used to dealing with in JQuery events. We still get all of the same properties attached to them, and some additional ones. Because of this, the traditional documentation on event handlers is sometimes not accurate. Instead, use the React event handling documentation found [here](https://facebook.github.io/react/docs/events.html). Spend a few minutes looking at the different events on listed here.
