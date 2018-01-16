@@ -67,15 +67,16 @@ This exercise is a simple, 2 "page" website where each page is a component. We'l
 * What causes the method to be (re)invoked?
 
 ## An Aside: Axios
+
 > 10 min / 0:50
 
 For our first example of working with the component lifecycle methods, we'll me retrieving data from an API using AJAX. AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
 
 We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method. Some benefits to using Axios:
 
-  - It is a promise-based library with an interface for simpler and cleaner syntax
-  - It is lightweight and focused solely on handling HTTP requests (as opposed to jQuery which brings in an extensive set of new functions and methods)
-  - It is flexible and has a number of very useful methods for doing more complex requests from one or multiple API endpoints
+* It is a promise-based library with an interface for simpler and cleaner syntax
+* It is lightweight and focused solely on handling HTTP requests (as opposed to jQuery which brings in an extensive set of new functions and methods)
+* It is flexible and has a number of very useful methods for doing more complex requests from one or multiple API endpoints
 
 Read more at the [Axios Documentation](https://github.com/mzabriskie/axios)
 
@@ -92,6 +93,7 @@ let axios = require('axios')
 ```
 
 To use Axios to query an API at a given url endpoint:
+
 ```js
   axios.get('url')
     .then((response) => {
@@ -102,7 +104,7 @@ To use Axios to query an API at a given url endpoint:
     })
 ```
 
-You can also append values to the parameters by passing in a second input to `.get()`:
+<!-- You can also append values to the parameters by passing in a second input to `.get()`:
 
 ```js
   axios.get('url', {
@@ -120,11 +122,12 @@ You can also append values to the parameters by passing in a second input to `.g
 ```
 
 Which would result in a GET request to: `url?key1=value1&key2=value2`.
+ -->
 
-### We Do: Axios and AJAX inside a React Component:
+<!-- ### We Do: Axios and AJAX inside a React Component:
 > 15 min / 1:05
 
-We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios).
+We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios). -->
 
 ## Break
 > 10 min / 1:15
@@ -148,35 +151,118 @@ The app we're going to build will pull word definitions from the Oxford Dictiona
 
 ### We Do: Adding the Flashcard Container
 
+#### Use Axios to query the dictionary API
+
 <details>
     <summary>Solution</summary>
 
 ```js
-class FlashcardContainer extends React.Component {
+// FlashcardContainer.js
+
+class FlashcardContainer extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+        flashcards: [], //holds all flashcards
+        currentIndex: 0 //index of current flashcard
+    }
+  }
+
+  componentDidMount () {
+    axios
+      .get(`${CLIENT_URL}/api/words`) //query the api
+      .then(response => this.setState({flashcards: response.data})) //set FlashcardContainer state
+      .catch(err => console.log(err))
+  }
+
+  render() {
+    //define the current variable
+    let flashcard = this.state.flashcards[this.state.currentIndex]
+
+    // returns a flashcard only if flashcard variable and FlashcardDetail component are defined
+    return (
+      <div>
+        <main>
+          <div className="container">
+            {flashcard && <FlashcardDetail card={flashcard} />}
+          </div>
+        </main>
+      </div>
+    )
+  }
+}
+```
+
+```js
+//FlashcardDetail.js
+
+class FlashcardDetail extends Component {
+  render () {
+    return (
+      <div>
+        // test that we have access to a flashcard
+        <h1>{this.props.card.word}</h1>
+      </div>
+    )
+  }
+}
+```
+
+</details>
+
+#### Add an event listener to switch between cards
+
+<details>
+    <summary>Solution</summary>
+
+```js
+//FlashcardContainer.js
+
+class FlashcardContainer extends Component {
     constructor(props) {
         super(props)
         this.state = {
             flashcards: [],
             currentIndex: 0
         }
+
+      // the below methods will be called from other components meaning 'this' will refer to a new scope. Oh no!
+      // Luckily, bind(this) binds the 'this' keyword to refer to the scope of the current FlashcardContainer class
+      this.handleKeyUp = this.handleKeyUp.bind(this)
+      this.next = this.next.bind(this)
     }
 
+    // increment currentIndex
     next () {
-        if (this.state.show)
-	        this.setState(currState => ({currentIndex: currState.currentIndex + 1}))
+      let nextIndex = (this.state.currentIndex + 1) === this.state.flashcards.length
+        ? this.state.currentIndex
+        : this.state.currentIndex + 1
+
+      this.setState({currentIndex: nextIndex})
+    }
+
+    // decremement currentIndex
+    prev () {
+      let prevIndex = (this.state.currentIndex - 1) < 0
+        ? 0
+        : (this.state.currentIndex - 1)
+
+      this.setState({currentIndex: prevIndex})
+    }
+
+    // callback to be used in the event listener below
+    handleKeyUp (event) {
+      if (event.keyCode === 39) this.next()
+      if (event.keyCode === 37) this.prev()
     }
 
     componentDidMount () {
-        window.addEventListener('keyup', (event) => {
-            // move to next card on right arrow
-            if (event.keyCode === 39)
-            this.next()
-        })
+      window.addEventListener('keyup', this.handleKeyUp)
 
-        axios
-	        .get(`${CLIENT_URL}/api/words`)
-	        .then(response => this.setState({flashcards: response.data}))
-	        .catch(err => console.log(err))
+      axios
+        .get(`${CLIENT_URL}/api/words`)
+        .then(response => this.setState({flashcards: response.data}))
+        .catch(err => console.log(err))
     }
 
     render() {
@@ -184,9 +270,10 @@ class FlashcardContainer extends React.Component {
         return (
             <div>
 	            <main>
-		            <div className="container">
-		            </div>
-	            </main>
+                <div className="container">
+                  {flashcard && <FlashcardDetail card={flashcard} />}
+                </div>
+              </main>
             </div>
         )
     }
@@ -199,15 +286,30 @@ In this example, we have added a constructor that has a few initial state proper
 
 ### You Do: Adding a Timer to the Flashcard
 
-Add a timer to the Flashcard Detail component. Initialize the timer to have 10 seconds on it. Every second the same flashcard is still on the board, remove a second from it (hint: use `window.setTimeout()`). When the `FlashcardDetail` component receives a new card, restart the timer (hint: use `componentWillReceiveProps`).
+Add a timer to the Flashcard Detail component.
+
+* Initialize the timer to have 10 seconds on it
+* Every second the same flashcard is still on the board, remove a second from it
+> **hint**: use `window.setTimeout()`)
+* When the timer reaches zero, switch to the next card
+> **hint**: where did you define the `next()` method? How can you access it from `FlashcardDetail.js`?
+* When the `FlashcardDetail` component receives a new card, restart the timer
+> **hint**: use `componentWillReceiveProps`
 
 #### We Do: Adding the Definition Component
 
-Now that we have our flashcard word displayed, lets add the definition as well.
+Now that we have our flashcard word displayed, lets add their definitions as well.
 
-For this, lets use a functional component -- or a component created by a function instead of a class -- and then change its style dynamically based on its index.
+For this, we will use a functional component -- or a component created by a function instead of a class -- and then change its style dynamically based on its index.
+
+<details>
+    <summary>Solution</summary>
 
 ```js
+//Definition.js
+
+import React from 'react'
+
 const COLORS = ['#673ab7', '#2196f3', '#26a69a', '#e91e63']
 
 let Definition = props => {
@@ -228,7 +330,29 @@ let Definition = props => {
         </div>
     )
 }
+
+export default Definition
 ```
+
+```js
+// FlashcardDetails.js
+...
+render () {
+  let flashcard = this.props.card
+
+  // we use .map to create a Definition component for each of the word's definitions
+  return (
+    <div>
+        <h3>{this.state.timer}</h3>
+        <h1>{flashcard.word}</h1>
+        {flashcard.definitions.map((def, idx) => <Definition def={def} key={def._id} idx={idx}/>)}
+    </div>
+  )
+}
+...
+```
+
+</details>
 
 ## You Do: Show or Hide the Definition
 
