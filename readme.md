@@ -210,6 +210,8 @@ class FlashcardDetail extends Component {
 
 </details>
 
+The componentDidMount method is called once, immediately after your component is rendered to the DOM. If you want to make an AJAX request when your component first renders, this is where to do it (not in the constructor, or in componentWillMount). componentWillMount shouldn't be used for server requests because it may be invoked multiple times before render. Side effects should be avoided in the constructor, and so server requests shouldn't be made there.
+
 #### Add an event listener to switch between cards
 
 <details>
