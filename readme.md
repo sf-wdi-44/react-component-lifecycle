@@ -130,10 +130,10 @@ Which would result in a GET request to: `url?key1=value1&key2=value2`.
 We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios). -->
 
 ## Break
-> 10 min / 1:15
+> 10 min / 1:00
 
 ## Flashcards
-> 85 min / 2:30
+> 90 min / 2:30
 
 As we dive deeper in to each of the component lifecycle methods and what they're used for, we'll work through the following exercise to create a simple flashcards app.
 
