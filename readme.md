@@ -9,7 +9,7 @@
 ## Framing
 > 10 min / 0:10
 
-Up to this point, we've used react to build out components that make up simple applications. We added state and props to these components and controlled data flow through them. With this alone, we do have the capacity to build out an application but they'll be limited.
+So far, we've used react components to build simple applications. We've added state and props and controlled data flow through them (using just the render and setState methods). In order to do more complex things, we'll have to use lifecycle methods.
 
 How do we get data from an API? Well we could drop in an AJAX call to fetch some data, but our component would likely render before the AJAX request returned with our data. Our component would see that our data is `undefined` and either render a blank/empty component or throw an error.
 
@@ -17,27 +17,29 @@ How would we animate a component? (i.e. a sidebar that usually lives off the pag
 
 This lesson will walk us through the Component Lifecycle: hooks that are fired at different stages of a components "life" for solving the problems described above, as well as many others.
 
-Throughout the course of this lesson, we'll build out a simple flashcard app with vocabulary keywords pulled form the Oxford Dictionary API. Our flashcard app will cycle through a set of flashcards, giving us 10 seconds to think of the definition before moving on to the next card.
+Throughout the course of this lesson, we'll build out a simple flashcard app with vocabulary keywords pulled from the Oxford Dictionary API. Our flashcard app will cycle through a set of flashcards, giving us 10 seconds to think of the definition before moving on to the next card.
 
 But first, what is the Component Lifecycle?
 
 ## The Component Lifecycle
 > 10 min / 0:20
 
-Class-based components provide several lifecycle methods that you can use to control your application based on the state of the UI.
+Components provide several lifecycle methods that you can use to control your application based on the state of the UI.
 
-If defined, these methods will be invoked automatically so you can define the ones you need.
+When you include these methods in the component they will be invoked automatically (because we are extending the React.Component class which has them already defined).
 
-These methods are called at specific points in the rendering process. You can use these methods to perform actions based on what's happening on the DOM.
+Lifecycle methods are called at specific points in the rendering process. You can use these methods to perform actions based on what's happening on the DOM.
 
 * `componentDidMount`, for example, is called immediately *after* a component is rendered to the DOM.
 * `componentWillUnmount` is called immediately *before* a component is removed from the DOM.
 
-Some common uses of lifecycle methods are making asynchronous requests, binding event listeners, and optimizing for performance.
+**What do you use lifecycle methods for?**
+
+Making asynchronous requests (ajax calls), binding event listeners to components, animating components (once they've rendered), and optimizing for performance (shouldComponentUpdate).
 
 ### At a very high level
 
-There are two types of component lifecycle methods, categorized by when the occur in the lifecycle: **mounting** lifecycle methods and **updating** lifecycle methods
+There are two types of component lifecycle methods:
 
 * **Mounting** lifecycle methods. e.g. What happens when the component is created? Was an initial state set? Methods:
   - `constructor()`
@@ -53,30 +55,31 @@ There are two types of component lifecycle methods, categorized by when the occu
   - `render()`
   - `componentDidUpdate()`
 
-[Check out the documentation on components!](https://facebook.github.io/react/docs/react-component.html)
+The documentation gives good examples of what each method should be used for. [Check out the documentation on components!](https://facebook.github.io/react/docs/react-component.html)
 
-### We do: Exploring the Lifecycle methods
-> 20 min / 0:40
+## We do: Exploring the Lifecycle methods (20 min / 0:40)
 
 Let's clone down [this repository](https://git.generalassemb.ly/ga-wdi-exercises/react-component-lifecycle) with a short exercise for exploring the lifecycle methods.
 
 This exercise is a simple, 2 "page" website where each page is a component. We'll be adding the component lifecycle methods to each page-component. As we do consider the following questions:
 
-* When is the method get invoked in relation to when the content is rendered?
+* When is the method invoked in relation to when the content is rendered?
 * How many times is the method invoked?
 * What causes the method to be (re)invoked?
 
-## An Aside: Axios
+> Add the mounting methods to HomePage.js and the update methods to AboutPage.js. console.log something to show the order.
 
-> 10 min / 0:50
+### An Aside: Axios (10 min / 0:50)
 
-For our first example of working with the component lifecycle methods, we'll me retrieving data from an API using AJAX. AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
+For our first example of working with the component lifecycle methods, we'll be retrieving data from an API using AJAX.
+AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
 
-We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method. Some benefits to using Axios:
+We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method, or window.Fetch(). Some benefits to using Axios:
 
-* It is a promise-based library with an interface for simpler and cleaner syntax
+* It is a promise-based library with an interface for simpler and cleaner syntax (compared to native XHR especially).
 * It is lightweight and focused solely on handling HTTP requests (as opposed to jQuery which brings in an extensive set of new functions and methods)
-* It is flexible and has a number of very useful methods for doing more complex requests from one or multiple API endpoints
+* It is very configurable and has a number of useful methods for doing more complex requests from one or multiple API endpoints
+* It handles a lot of the http header manual work for you (e.g. send a json file, it sets `Content-Type: application/json`)
 
 Read more at the [Axios Documentation](https://github.com/mzabriskie/axios)
 
@@ -221,64 +224,64 @@ The componentDidMount method is called once, immediately after your component is
 //FlashcardContainer.js
 
 class FlashcardContainer extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            flashcards: [],
-            currentIndex: 0
-        }
-
-      // the below methods will be called from other components meaning 'this' will refer to a new scope. Oh no!
-      // Luckily, bind(this) binds the 'this' keyword to refer to the scope of the current FlashcardContainer class
-      this.handleKeyUp = this.handleKeyUp.bind(this)
-      this.next = this.next.bind(this)
+  constructor(props) {
+    super(props)
+    this.state = {
+      flashcards: [],
+      currentIndex: 0
     }
 
-    // increment currentIndex
-    next () {
-      let nextIndex = (this.state.currentIndex + 1) === this.state.flashcards.length
-        ? this.state.currentIndex
-        : this.state.currentIndex + 1
+    // the below methods will be called from other components meaning 'this' will refer to a new scope. Oh no!
+    // Luckily, bind(this) binds the 'this' keyword to refer to the scope of the current FlashcardContainer class
+    this.handleKeyUp = this.handleKeyUp.bind(this)
+    this.next = this.next.bind(this)
+  }
 
-      this.setState({currentIndex: nextIndex})
-    }
+  // increment currentIndex
+  next () {
+    let nextIndex = (this.state.currentIndex + 1) === this.state.flashcards.length
+      ? this.state.currentIndex
+      : this.state.currentIndex + 1
 
-    // decremement currentIndex
-    prev () {
-      let prevIndex = (this.state.currentIndex - 1) < 0
-        ? 0
-        : (this.state.currentIndex - 1)
+    this.setState({currentIndex: nextIndex})
+  }
 
-      this.setState({currentIndex: prevIndex})
-    }
+  // decremement currentIndex
+  prev () {
+    let prevIndex = (this.state.currentIndex - 1) < 0
+      ? 0
+      : (this.state.currentIndex - 1)
 
-    // callback to be used in the event listener below
-    handleKeyUp (event) {
-      if (event.keyCode === 39) this.next()
-      if (event.keyCode === 37) this.prev()
-    }
+    this.setState({currentIndex: prevIndex})
+  }
 
-    componentDidMount () {
-      window.addEventListener('keyup', this.handleKeyUp)
+  // callback to be used in the event listener below
+  handleKeyUp (event) {
+    if (event.keyCode === 39) this.next()
+    if (event.keyCode === 37) this.prev()
+  }
 
-      axios
-        .get(`${CLIENT_URL}/api/words`)
-        .then(response => this.setState({flashcards: response.data}))
-        .catch(err => console.log(err))
-    }
+  componentDidMount () {
+    window.addEventListener('keyup', this.handleKeyUp)
 
-    render() {
-        let flashcard = this.state.flashcards[this.state.currentIndex]
-        return (
-            <div>
-	            <main>
-                <div className="container">
-                  {flashcard && <FlashcardDetail card={flashcard} />}
-                </div>
-              </main>
+    axios
+      .get(`${CLIENT_URL}/api/words`)
+      .then(response => this.setState({flashcards: response.data}))
+      .catch(err => console.log(err))
+  }
+
+  render() {
+    let flashcard = this.state.flashcards[this.state.currentIndex]
+      return (
+        <div>
+         <main>
+            <div className="container">
+              {flashcard && <FlashcardDetail card={flashcard} />}
             </div>
-        )
-    }
+          </main>
+        </div>
+      )
+  }
 }
 ```
 
