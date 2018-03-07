@@ -65,11 +65,11 @@ Let's clone down [this repository](https://git.generalassemb.ly/ga-wdi-exercises
 
 This exercise is a simple, 2 "page" website where each page is a component. We'll be adding the component lifecycle methods to each page-component. As we do consider the following questions:
 
-* When is the method invoked in relation to when the content is rendered?
+* What order are the methods run in? Before or after rendering?
 * How many times is the method invoked?
 * What causes the method to be (re)invoked?
 
-> Add the mounting methods to HomePage.js and the update methods to AboutPage.js. console.log something to show the order.
+> Add the mounting methods to HomePage.js and the update methods to AboutPage.js. console.log something in each method to understand the order.
 
 ### An Aside: Axios (10 min / 0:50)
 
@@ -164,9 +164,9 @@ The app we're going to build will pull characters from the Star Wars API (SWAPI)
 
 class FlashcardContainer extends Component {
   constructor() {
-    super();
+    super(); 
 
-    this.state =  {
+    this.state = {
       flashcards: [],
       currentIndex: 0
     }
@@ -174,42 +174,23 @@ class FlashcardContainer extends Component {
 
   componentDidMount() {
     axios.get(CLIENT_URL)
-      .then(res => {
-        console.log(res);
-        this.setState({flashcards: res.data.results})
-      })
-      .catch(err => {
-        console.error(err);
-      })
+      .then((response) => {
+          console.log(response)
+          this.setState({flashcards: response.data})
+        })
   }
 
   render() {
-    let details = this.state.flashcards[this.state.currentIndex];
-    let flashDetail;
-    if(details) {
-      flashDetail = <FlashcardDetail details={details} />
+    let detail = this.state.flashcards[this.state.currentIndex]
+    let card;
+
+    if(detail) {
+      card = <Flashcard detail={detail}/>
     }
 
     return (
-      <div className="container">
-        {flashDetail}
-      </div>
-    )
-  }
-}
-```
-
-```js
-//FlashcardDetail.js
-
-class FlashcardDetail extends Component {
-  render() {
-    const { name, height, birth_year } = this.props.details
-    return (
       <div>
-        <p>{name}</p>
-        <p>{height}</p>
-        <p>{birth_year}</p>
+        {card}
       </div>
     )
   }
@@ -229,8 +210,8 @@ The componentDidMount method is called once, immediately after your component is
 //FlashcardContainer.js
 
 class FlashcardContainer extends Component {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super()
     this.state = {
       flashcards: [],
       currentIndex: 0
@@ -272,25 +253,23 @@ class FlashcardContainer extends Component {
 
     axios
       .get(CLIENT_URL)
-      .then(res => this.setState({flashcards: res.data.results}))
+      .then(response => this.setState({flashcards: response.data}))
       .catch(err => console.log(err))
   }
 
   render() {
-    let details = this.state.flashcards[this.state.currentIndex]
-    let flashDetail;
-    if(details) {
-      flashDetail = <FlashcardDetail details={details} />
+    let detail = this.state.flashcards[this.state.currentIndex]
+    let card;
+
+    if(detail) {
+      card = <Flashcard detail={detail}/>
     }
-      return (
-        <div>
-         <main>
-            <div className="container">
-              {flashdetail}
-            </div>
-          </main>
-        </div>
-      )
+
+    return (
+      <div>
+        {card}
+      </div>
+    )
   }
 }
 ```
@@ -336,7 +315,6 @@ const FlashcardMeta = (props) => {
 }
 
 export default FlashcardMeta
-
 ```
 
 ```js
