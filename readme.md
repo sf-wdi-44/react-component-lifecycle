@@ -286,8 +286,9 @@ Add a timer to the Flashcard Detail component.
 * Every second the same flashcard is still on the board, remove a second from it
 > **hint**: use `window.setTimeout()`)
 * When the timer reaches zero, switch to the next card
-> **hint**: where did you define the `next()` method? How can you access it from `FlashcardDetail.js`?
-* When the `FlashcardDetail` component receives a new card, restart the timer
+> **hint**: where did you define the `next()` method? How can you access it from `Flashcard.js`?
+* When the `Flashcard` component receives a new card, restart the timer
+
 > **hint**: use `componentWillReceiveProps`
 
 #### We Do: Adding the Definition Component
@@ -300,37 +301,36 @@ For this, we will use a pure functional component -- or a component created by a
     <summary>Solution</summary>
 
 ```js
-//FlashcardMeta.js
+//Definition.js
 
 import React from 'react';
 
-const FlashcardMeta = (props) => {
-	
+let Definition = (props) => {
+
 	return (
-		<div className="card text-center">
-			<p>{props.meta.height}</p>
-			<p>{props.meta.birth_year}</p>
+		<div className="">
+			<p>{props.def}</p>
 		</div>
 	)
 }
 
-export default FlashcardMeta
+export default Definition;
 ```
 
 ```js
-// FlashcardDetails.js
+// Flashcard.js
 ...
-render () {
-  let flashcard = this.props.card
+class Flashcard extends Component {
+  render() {
+    let defs = this.props.detail.definitions[0].definitions 
 
-  // we use .map to create a Definition component for each of the word's definitions
-  return (
-    <div>
-      <h3>{this.state.timer}</h3>
-      <h1>{flashcard.word}</h1>
-      {this.state.flashcards.map((card, idx) => <Definition def={def} key={def._id} idx={idx}/>)}
-    </div>
-  )
+    return (
+      <div class="card">
+        <p>{this.props.detail.word}</p>
+        { defs.map(def => <Definition def={def} /> )}
+      </div>
+    )
+  }
 }
 ...
 ```
