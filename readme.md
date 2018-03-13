@@ -6,38 +6,42 @@
 * Handle events in React
 * Look at the React documentation to learn more
 
-## Framing
-> 10 min / 0:10
+## Framing (10 min / 0:10)
 
-Up to this point, we've used react to build out components that make up simple applications. We added state and props to these components and controlled data flow through them. With this alone, we do have the capacity to build out an application but they'll be limited.
+So far, we've used react components to build simple applications. We've added state and props and controlled data flow through them (using just the render and setState methods). In order to do more complex things, we'll have to use lifecycle methods.
 
-How do we get data from an API? Well we could drop in an AJAX call to fetch some data, but our component would likely render before the AJAX request returned with our data. Our component would see that our data is `undefined` and either render a blank/empty component or throw an error.
+How do we get data from an API? Well we could drop in an AJAX call to fetch some data, but our component would likely render before the AJAX request finished. Our component would see that our data is `undefined` and either render a blank/empty component or throw an error.
 
 How would we animate a component? (i.e. a sidebar that usually lives off the page, except for when a hamburger menu is pressed.) We could write some code to animate the position of the sidebar, but how could we guarantee it was running after our Sidebar component's render method had been called?
 
 This lesson will walk us through the Component Lifecycle: hooks that are fired at different stages of a components "life" for solving the problems described above, as well as many others.
 
-Throughout the course of this lesson, we'll build out a simple flashcard app with vocabulary keywords pulled form the Oxford Dictionary API. Our flashcard app will cycle through a set of flashcards, giving us 10 seconds to think of the definition before moving on to the next card.
+Throughout the course of this lesson, we'll build out a simple flashcard app with vocabulary keywords pulled from the Oxford Dictionary API. Our flashcard app will cycle through a set of flashcards, giving us 10 seconds to think of the definition before moving on to the next card.
 
 But first, what is the Component Lifecycle?
 
-## The Component Lifecycle
-> 10 min / 0:20
+## The Component Lifecycle (10 min / 0:20)
 
-Class-based components provide several lifecycle methods that you can use to control your application based on the state of the UI.
+Components provide several lifecycle methods that you can use to control your application based on the state of the UI.
 
-If defined, these methods will be invoked automatically so you can define the ones you need.
+When you include these methods in the component they will be invoked automatically (because we are extending the React.Component class which has them already defined).
 
-These methods are called at specific points in the rendering process. You can use these methods to perform actions based on what's happening on the DOM.
+Lifecycle methods are called at specific points in the rendering process. You can use these methods to perform actions based on what's happening on the DOM.
 
-* `componentDidMount`, for example, is called immediately *after* a component is rendered to the DOM.
 * `componentWillUnmount` is called immediately *before* a component is removed from the DOM.
+* `componentDidMount`, for example, is called immediately *after* a component is rendered to the DOM.
 
-Some common uses of lifecycle methods are making asynchronous requests, binding event listeners, and optimizing for performance.
+**What do you use lifecycle methods for?**
+
+Making asynchronous requests (ajax calls), binding event listeners to components, animating components (once they've rendered), and optimizing for performance (shouldComponentUpdate).
+
+**Why is it called a lifecycle?**
+It's an action that repeats
+![ ](https://www.codevoila.com/uploads/images/201607/reactjs_component_lifecycle_functions.png  "React-component-lifecycle")
 
 ### At a very high level
 
-There are two types of component lifecycle methods, categorized by when the occur in the lifecycle: **mounting** lifecycle methods and **updating** lifecycle methods
+There are two types of component lifecycle methods:
 
 * **Mounting** lifecycle methods. e.g. What happens when the component is created? Was an initial state set? Methods:
   - `constructor()`
@@ -53,34 +57,35 @@ There are two types of component lifecycle methods, categorized by when the occu
   - `render()`
   - `componentDidUpdate()`
 
-[Check out the documentation on components!](https://facebook.github.io/react/docs/react-component.html)
+The documentation gives good examples of what each method should be used for. [Check out the documentation on components!](https://facebook.github.io/react/docs/react-component.html)
 
-### We do: Exploring the Lifecycle methods
-> 20 min / 0:40
+## We do: Exploring the Lifecycle methods (20 min / 0:40)
 
 Let's clone down [this repository](https://git.generalassemb.ly/ga-wdi-exercises/react-component-lifecycle) with a short exercise for exploring the lifecycle methods.
 
 This exercise is a simple, 2 "page" website where each page is a component. We'll be adding the component lifecycle methods to each page-component. As we do consider the following questions:
 
-* When is the method get invoked in relation to when the content is rendered?
+* What order are the methods run in? Before or after rendering?
 * How many times is the method invoked?
 * What causes the method to be (re)invoked?
 
-## An Aside: Axios
+> Add the mounting methods to HomePage.js and the update methods to AboutPage.js. console.log something in each method to understand the order.
 
-> 10 min / 0:50
+### An Aside: Axios (10 min / 0:50)
 
-For our first example of working with the component lifecycle methods, we'll me retrieving data from an API using AJAX. AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
+For our first example of working with the component lifecycle methods, we'll be retrieving data from an API using AJAX.
+AJAX calls are asynchronous, so we have to be mindful of how long our request will take and when our components will render.
 
-We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method. Some benefits to using Axios:
+We're going to use a module named `axios` to make our calls. Axios is a node module commonly used with React to send HTTP requests to an API. It functions much like jQuery's Ajax method, or window.Fetch(). Some benefits to using Axios:
 
-* It is a promise-based library with an interface for simpler and cleaner syntax
+* It is a promise-based library with an interface for simpler and cleaner syntax (compared to native XHR especially).
 * It is lightweight and focused solely on handling HTTP requests (as opposed to jQuery which brings in an extensive set of new functions and methods)
-* It is flexible and has a number of very useful methods for doing more complex requests from one or multiple API endpoints
+* It is very configurable and has a number of useful methods for doing more complex requests from one or multiple API endpoints
+* It handles a lot of the http header manual work for you (e.g. send a json file, it sets `Content-Type: application/json`)
 
 Read more at the [Axios Documentation](https://github.com/mzabriskie/axios)
 
-> Note: Axios is just one of many Javascript libraries that we could use for handling requests. One of the big selling points of Node is the ability to mix and match technologies according to preference. Other commonly-used tools for handling requests are Fetch and jQuery.
+> Note: Axios is just one of many Javascript libraries that we could use for handling requests. One of the big selling points of javascript is the ability to mix and match technologies according to preference. Other commonly-used tools for handling requests are fetch and jQuery.
 
 To load in the Axios module:
 
@@ -95,13 +100,13 @@ let axios = require('axios')
 To use Axios to query an API at a given url endpoint:
 
 ```js
-  axios.get('url')
-    .then((response) => {
-      console.log(response)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+axios.get('url')
+  .then((response) => {
+    console.log(response)
+  })
+  .catch((error) => {
+    console.log(error)
+  })
 ```
 
 <!-- You can also append values to the parameters by passing in a second input to `.get()`:
@@ -129,11 +134,9 @@ Which would result in a GET request to: `url?key1=value1&key2=value2`.
 
 We will be using Axios to query the PokéAPI in [this exercise](https://git.generalassemb.ly/ga-wdi-exercises/react-components-axios). -->
 
-## Break
-> 10 min / 1:00
+## Break (10 min / 1:00)
 
-## Flashcards
-> 90 min / 2:30
+## Flashcards (90 min / 2:30)
 
 As we dive deeper in to each of the component lifecycle methods and what they're used for, we'll work through the following exercise to create a simple flashcards app.
 
@@ -147,11 +150,11 @@ $ npm install
 $ npm start
 ```
 
-The app we're going to build will pull word definitions from the Oxford Dictionary API and create a flashcard for each word. The app will then cycle through each word, giving the user 10 seconds to think of the definition before moving on to the next card.
+The app we're going to build will pull characters from the Star Wars API (SWAPI) and create a flashcard for each person. The app will then cycle through each word, giving the user 10 seconds to think of the definition before moving on to the next card.
 
 ### We Do: Adding the Flashcard Container
 
-#### Use Axios to query the dictionary API
+#### Use Axios to query the star wars API
 
 <details>
     <summary>Solution</summary>
@@ -160,48 +163,34 @@ The app we're going to build will pull word definitions from the Oxford Dictiona
 // FlashcardContainer.js
 
 class FlashcardContainer extends Component {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super(); 
+
     this.state = {
-        flashcards: [], //holds all flashcards
-        currentIndex: 0 //index of current flashcard
+      flashcards: [],
+      currentIndex: 0
     }
   }
 
-  componentDidMount () {
-    axios
-      .get(`${CLIENT_URL}/api/words`) //query the api
-      .then(response => this.setState({flashcards: response.data})) //set FlashcardContainer state
-      .catch(err => console.log(err))
+  componentDidMount() {
+    axios.get(CLIENT_URL)
+      .then((response) => {
+          console.log(response)
+          this.setState({flashcards: response.data})
+        })
   }
 
   render() {
-    //define the current variable
-    let flashcard = this.state.flashcards[this.state.currentIndex]
+    let detail = this.state.flashcards[this.state.currentIndex]
+    let card;
 
-    // returns a flashcard only if flashcard variable and FlashcardDetail component are defined
+    if(detail) {
+      card = <Flashcard detail={detail}/>
+    }
+
     return (
       <div>
-        <main>
-          <div className="container">
-            {flashcard && <FlashcardDetail card={flashcard} />}
-          </div>
-        </main>
-      </div>
-    )
-  }
-}
-```
-
-```js
-//FlashcardDetail.js
-
-class FlashcardDetail extends Component {
-  render () {
-    return (
-      <div>
-        // test that we have access to a flashcard
-        <h1>{this.props.card.word}</h1>
+        {card}
       </div>
     )
   }
@@ -221,64 +210,67 @@ The componentDidMount method is called once, immediately after your component is
 //FlashcardContainer.js
 
 class FlashcardContainer extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            flashcards: [],
-            currentIndex: 0
-        }
-
-      // the below methods will be called from other components meaning 'this' will refer to a new scope. Oh no!
-      // Luckily, bind(this) binds the 'this' keyword to refer to the scope of the current FlashcardContainer class
-      this.handleKeyUp = this.handleKeyUp.bind(this)
-      this.next = this.next.bind(this)
+  constructor() {
+    super()
+    this.state = {
+      flashcards: [],
+      currentIndex: 0
     }
 
-    // increment currentIndex
-    next () {
-      let nextIndex = (this.state.currentIndex + 1) === this.state.flashcards.length
-        ? this.state.currentIndex
-        : this.state.currentIndex + 1
+    // the below methods will be called from other components meaning 'this' will refer to a new scope. Oh no!
+    // Luckily, bind(this) binds the 'this' keyword to refer to the scope of the current FlashcardContainer class
+    this.handleKeyUp = this.handleKeyUp.bind(this)
+    this.next = this.next.bind(this)
+    this.prev = this.prev.bind(this)
+  }
 
-      this.setState({currentIndex: nextIndex})
+  // increment currentIndex
+  next () {
+    let nextIndex = (this.state.currentIndex + 1) === this.state.flashcards.length
+      ? this.state.currentIndex
+      : this.state.currentIndex + 1
+
+    this.setState({currentIndex: nextIndex})
+  }
+
+  // decremement currentIndex
+  prev () {
+    let prevIndex = (this.state.currentIndex - 1) < 0
+      ? 0
+      : (this.state.currentIndex - 1)
+
+    this.setState({currentIndex: prevIndex})
+  }
+
+  // callback to be used in the event listener below
+  handleKeyUp (event) {
+    if (event.keyCode === 39) this.next()
+    if (event.keyCode === 37) this.prev()
+  }
+
+  componentDidMount () {
+    window.addEventListener('keyup', this.handleKeyUp)
+
+    axios
+      .get(CLIENT_URL)
+      .then(response => this.setState({flashcards: response.data}))
+      .catch(err => console.log(err))
+  }
+
+  render() {
+    let detail = this.state.flashcards[this.state.currentIndex]
+    let card;
+
+    if(detail) {
+      card = <Flashcard detail={detail}/>
     }
 
-    // decremement currentIndex
-    prev () {
-      let prevIndex = (this.state.currentIndex - 1) < 0
-        ? 0
-        : (this.state.currentIndex - 1)
-
-      this.setState({currentIndex: prevIndex})
-    }
-
-    // callback to be used in the event listener below
-    handleKeyUp (event) {
-      if (event.keyCode === 39) this.next()
-      if (event.keyCode === 37) this.prev()
-    }
-
-    componentDidMount () {
-      window.addEventListener('keyup', this.handleKeyUp)
-
-      axios
-        .get(`${CLIENT_URL}/api/words`)
-        .then(response => this.setState({flashcards: response.data}))
-        .catch(err => console.log(err))
-    }
-
-    render() {
-        let flashcard = this.state.flashcards[this.state.currentIndex]
-        return (
-            <div>
-	            <main>
-                <div className="container">
-                  {flashcard && <FlashcardDetail card={flashcard} />}
-                </div>
-              </main>
-            </div>
-        )
-    }
+    return (
+      <div>
+        {card}
+      </div>
+    )
+  }
 }
 ```
 
@@ -294,15 +286,16 @@ Add a timer to the Flashcard Detail component.
 * Every second the same flashcard is still on the board, remove a second from it
 > **hint**: use `window.setTimeout()`)
 * When the timer reaches zero, switch to the next card
-> **hint**: where did you define the `next()` method? How can you access it from `FlashcardDetail.js`?
-* When the `FlashcardDetail` component receives a new card, restart the timer
+> **hint**: where did you define the `next()` method? How can you access it from `Flashcard.js`?
+* When the `Flashcard` component receives a new card, restart the timer
+
 > **hint**: use `componentWillReceiveProps`
 
 #### We Do: Adding the Definition Component
 
-Now that we have our flashcard word displayed, lets add their definitions as well.
+Now that we have our flashcard displayed, lets add their definitions as well.
 
-For this, we will use a functional component -- or a component created by a function instead of a class -- and then change its style dynamically based on its index.
+For this, we will use a pure functional component -- or a component created by a function instead of a class -- and then change its style dynamically based on its index.
 
 <details>
     <summary>Solution</summary>
@@ -310,46 +303,34 @@ For this, we will use a functional component -- or a component created by a func
 ```js
 //Definition.js
 
-import React from 'react'
+import React from 'react';
 
-const COLORS = ['#673ab7', '#2196f3', '#26a69a', '#e91e63']
+let Definition = (props) => {
 
-let Definition = props => {
-    let def = props.def
-    let idx = props.idx
-
-    let styles = {
-        color: 'white',
-        padding: '10px',
-        backgroundColor: COLORS[idx]
-    }
-
-    return (
-        <div className="card text-center"
-            style={styles}>
-            <h5>Definition {idx + 1}</h5>
-            <p>{ def.definitions[0] }</p>
-        </div>
-    )
+	return (
+		<div className="">
+			<p>{props.def}</p>
+		</div>
+	)
 }
 
-export default Definition
+export default Definition;
 ```
 
 ```js
-// FlashcardDetails.js
+// Flashcard.js
 ...
-render () {
-  let flashcard = this.props.card
+class Flashcard extends Component {
+  render() {
+    let defs = this.props.detail.definitions[0].definitions 
 
-  // we use .map to create a Definition component for each of the word's definitions
-  return (
-    <div>
-        <h3>{this.state.timer}</h3>
-        <h1>{flashcard.word}</h1>
-        {flashcard.definitions.map((def, idx) => <Definition def={def} key={def._id} idx={idx}/>)}
-    </div>
-  )
+    return (
+      <div class="card">
+        <p>{this.props.detail.word}</p>
+        { defs.map(def => <Definition def={def} /> )}
+      </div>
+    )
+  }
 }
 ...
 ```
