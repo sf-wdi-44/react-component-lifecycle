@@ -36,8 +36,9 @@ Lifecycle methods are called at specific points in the rendering process. You ca
 Making asynchronous requests (ajax calls), binding event listeners to components, animating components (once they've rendered), and optimizing for performance (shouldComponentUpdate).
 
 **Why is it called a lifecycle?**
-It's an action that repeats
-![ ](https://www.codevoila.com/uploads/images/201607/reactjs_component_lifecycle_functions.png  "React-component-lifecycle")
+It's an action that repeats in a specific order.
+
+![ ](./images/reactjs_component_lifecycle_functions.png  "React-component-lifecycle")
 
 ### At a very high level
 
