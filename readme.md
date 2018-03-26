@@ -151,11 +151,11 @@ $ npm install
 $ npm start
 ```
 
-The app we're going to build will pull characters from the Star Wars API (SWAPI) and create a flashcard for each person. The app will then cycle through each word, giving the user 10 seconds to think of the definition before moving on to the next card.
+The app we're going to build will pull characters from a dictionary API and create a flashcard for each word and definition`. The app will then cycle through each word, giving the user 10 seconds to think of the definition before moving on to the next card.
 
 ### We Do: Adding the Flashcard Container
 
-#### Use Axios to query the star wars API
+#### Use Axios to query the dictionary API
 
 <details>
     <summary>Solution</summary>
