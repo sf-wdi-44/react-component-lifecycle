@@ -8,7 +8,7 @@
 
 ## Framing (10 min / 0:10)
 
-So far, we've used react components to build simple applications. We've added state and props and controlled data flow through them (using just the render and setState methods). In order to do more complex things, we'll have to use lifecycle methods.
+So far, we've used react components to build a simple application. We've added state and props and controlled data flow (using just the render and setState methods). In order to do more complex things, we'll have to use lifecycle methods.
 
 How do we get data from an API? Well we could drop in an AJAX call to fetch some data, but our component would likely render before the AJAX request finished. Our component would see that our data is `undefined` and either render a blank/empty component or throw an error.
 
@@ -141,12 +141,12 @@ We will be using Axios to query the PokéAPI in [this exercise](https://git.gene
 
 As we dive deeper in to each of the component lifecycle methods and what they're used for, we'll work through the following exercise to create a simple flashcards app.
 
-The starter code for this exercise can be found [here](https://git.generalassemb.ly/ga-wdi-exercises/flashcards).
+The starter code for this exercise can be found [here](https://github.com/sf-wdi-44/flashcards).
 
 Let's go ahead and clone the repository:
 
 ```bash
-$ git clone git@git.generalassemb.ly:ga-wdi-exercises/flashcards.git
+$ git clone https://github.com/sf-wdi-44/flashcards
 $ npm install
 $ npm start
 ```
